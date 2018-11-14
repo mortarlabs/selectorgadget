@@ -501,7 +501,7 @@
     };
 
     SelectorGadget.prototype.makeInterface = function() {
-      this.sg_div = jQuerySG('<div>').attr('id', 'selectorgadget_main').addClass('selectorgadget_bottom').addClass('selectorgadget_ignore');
+      this.sg_div = jQuerySG('<div>').attr('id', 'selectorgadget_main').addClass('selectorgadget_top').addClass('selectorgadget_ignore');
       if (this.useRemoteInterface()) {
         this.path_output_field = {
           value: null

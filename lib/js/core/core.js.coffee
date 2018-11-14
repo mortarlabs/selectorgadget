@@ -370,7 +370,7 @@ window.SelectorGadget = class SelectorGadget
       document.body.appendChild(s)
 
   makeInterface: ->
-    @sg_div = jQuerySG('<div>').attr('id', 'selectorgadget_main').addClass('selectorgadget_bottom').addClass('selectorgadget_ignore')
+    @sg_div = jQuerySG('<div>').attr('id', 'selectorgadget_main').addClass('selectorgadget_top').addClass('selectorgadget_ignore')
   
     if @useRemoteInterface()
       @path_output_field = { value: null }

@@ -7942,7 +7942,7 @@ function diff_match_patch(){this.Diff_Timeout=1.0;this.Diff_EditCost=4;this.Diff
     };
 
     SelectorGadget.prototype.makeInterface = function() {
-      this.sg_div = jQuerySG('<div>').attr('id', 'selectorgadget_main').addClass('selectorgadget_bottom').addClass('selectorgadget_ignore');
+      this.sg_div = jQuerySG('<div>').attr('id', 'selectorgadget_main').addClass('selectorgadget_top').addClass('selectorgadget_ignore');
       if (this.useRemoteInterface()) {
         this.path_output_field = {
           value: null
