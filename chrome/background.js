@@ -10,8 +10,6 @@ function injectExtension(tabId, frameId) {
   	jsObj.frameId = frameId;
   };
 
-  console.log(["tab:", tabId, "frame:", frameId].join(" "));
-
   chrome.tabs.insertCSS(tabId, cssObj);
   chrome.tabs.executeScript(tabId, jsObj);
 }
@@ -28,3 +26,19 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   	}
   });
 });
+
+chrome.webRequest.onHeadersReceived.addListener(
+  function (details) {
+		var responseHeaders = [];
+    for (var i = 0; i < details.responseHeaders.length; ++i) {
+			if (details.responseHeaders[i].name.toLowerCase() != 'x-frame-options' &&
+					details.responseHeaders[i].name.toLowerCase() != 'content-security-policy') {
+				responseHeaders.push(details.responseHeaders[i]);
+			}
+		}
+		return {
+			responseHeaders: responseHeaders
+		};
+  }, {
+    urls: ["<all_urls>"]
+  }, ["blocking", "responseHeaders"]);
