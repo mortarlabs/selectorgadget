@@ -29,16 +29,19 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
 chrome.webRequest.onHeadersReceived.addListener(
   function (details) {
-		var responseHeaders = [];
-    for (var i = 0; i < details.responseHeaders.length; ++i) {
-			if (details.responseHeaders[i].name.toLowerCase() != 'x-frame-options' &&
-					details.responseHeaders[i].name.toLowerCase() != 'content-security-policy') {
-				responseHeaders.push(details.responseHeaders[i]);
+		if (details.parentFrameId > -1) {
+			var responseHeaders = [];
+			for (var i = 0; i < details.responseHeaders.length; ++i) {
+				if (details.responseHeaders[i].name.toLowerCase() != 'x-frame-options' &&
+						details.responseHeaders[i].name.toLowerCase() != 'content-security-policy') {
+					responseHeaders.push(details.responseHeaders[i]);
+				}
 			}
+			return {
+				responseHeaders: responseHeaders
+			};
 		}
-		return {
-			responseHeaders: responseHeaders
-		};
   }, {
-    urls: ["<all_urls>"]
+		urls: ["<all_urls>"],
+		types: ['sub_frame']
   }, ["blocking", "responseHeaders"]);
