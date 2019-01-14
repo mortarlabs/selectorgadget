@@ -1,3 +1,5 @@
+var SS_TABS = {};
+
 function injectExtension(tabId, frameId) {
   var cssObj = {
   	file: "combined.css"
@@ -27,9 +29,39 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   });
 });
 
+chrome.webRequest.onBeforeRequest.addListener(
+	function(details) {
+		SS_TABS[details.tabId] = details.url;
+	}, {
+		urls: ['*://*.saversage.com/*'],
+		types: ['main_frame']
+	},
+	['blocking']
+);
+
+
+chrome.webRequest.onBeforeSendHeaders.addListener(
+  function (details) {
+		if (details.parentFrameId > -1 && details.tabId in SS_TABS) {
+			var requestHeaders = [];
+			for (var i = 0; i < details.requestHeaders.length; ++i) {
+				if (details.requestHeaders[i].name.toLowerCase() != 'cookie' && 
+						details.requestHeaders[i].name.toLowerCase() != 'referer') {
+					requestHeaders.push(details.requestHeaders[i]);
+				}
+			}
+			return {
+				requestHeaders: requestHeaders
+			};	
+		}
+  }, {
+		urls: ['<all_urls>'],
+		types: ['sub_frame']
+  }, ['blocking', 'requestHeaders']);
+
 chrome.webRequest.onHeadersReceived.addListener(
   function (details) {
-		if (details.parentFrameId > -1) {
+		if (details.parentFrameId > -1 && details.tabId in SS_TABS) {
 			var responseHeaders = [];
 			for (var i = 0; i < details.responseHeaders.length; ++i) {
 				if (details.responseHeaders[i].name.toLowerCase() != 'x-frame-options' &&
@@ -39,9 +71,9 @@ chrome.webRequest.onHeadersReceived.addListener(
 			}
 			return {
 				responseHeaders: responseHeaders
-			};
+			};	
 		}
   }, {
-		urls: ["<all_urls>"],
+		urls: ['<all_urls>'],
 		types: ['sub_frame']
-  }, ["blocking", "responseHeaders"]);
+  }, ['blocking', 'responseHeaders']);
