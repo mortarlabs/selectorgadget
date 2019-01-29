@@ -8,7 +8,14 @@
   "description": "CSS Selectors for Development",
   "version": "1.0",
   "permissions": [
-    "tabs", "http://*/*", "https://*/*", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>"
+    "tabs", 
+    "http://*/*", 
+    "https://*/*", 
+    "webNavigation", 
+    "webRequest", 
+    "webRequestBlocking", 
+    "proxy",
+    "<all_urls>"
   ],
   "background": {
     "scripts": ["background.js"],

@@ -43,9 +43,11 @@ chrome.webRequest.onBeforeRequest.addListener(
 chrome.webRequest.onBeforeSendHeaders.addListener(
   function (details) {
 		if (details.parentFrameId > -1 && details.tabId in SS_TABS) {
-			var requestHeaders = [];
+			var requestHeaders = [], 
+					IS_SAVERSAGE = details.url.indexOf('saversage.com') > 0;
 			for (var i = 0; i < details.requestHeaders.length; ++i) {
-				if (details.requestHeaders[i].name.toLowerCase() != 'cookie' && 
+				if (IS_SAVERSAGE || 
+						details.requestHeaders[i].name.toLowerCase() != 'cookie' && 
 						details.requestHeaders[i].name.toLowerCase() != 'referer') {
 					requestHeaders.push(details.requestHeaders[i]);
 				}
@@ -61,19 +63,28 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 chrome.webRequest.onHeadersReceived.addListener(
   function (details) {
-		if (details.parentFrameId > -1 && details.tabId in SS_TABS) {
-			var responseHeaders = [];
-			for (var i = 0; i < details.responseHeaders.length; ++i) {
-				if (details.responseHeaders[i].name.toLowerCase() != 'x-frame-options' &&
-						details.responseHeaders[i].name.toLowerCase() != 'content-security-policy') {
-					responseHeaders.push(details.responseHeaders[i]);
-				}
+	if (details.parentFrameId > -1 && details.tabId in SS_TABS) {
+		var responseHeaders = [], ruleCORS = {
+			"name": "Access-Control-Allow-Origin",
+			"value": "*"
+		}, matchedCORS = false;
+		for (var i = 0; i < details.responseHeaders.length; ++i) {
+			var headerName = details.responseHeaders[i].name.toLowerCase();
+			if (headerName != 'x-frame-options' &&
+				headerName != 'content-security-policy') {
+				responseHeaders.push(details.responseHeaders[i]);
+			} else if (headerName == ruleCORS.name.toLowerCase()) {
+				matchedCORS = true;
 			}
-			return {
-				responseHeaders: responseHeaders
-			};	
 		}
+		if (!matchedCORS) {
+			responseHeaders.push(ruleCORS);
+		} 
+		return {
+			responseHeaders: responseHeaders
+		};	
+	} 
   }, {
 		urls: ['<all_urls>'],
-		types: ['sub_frame']
+		types: ['sub_frame', 'font', 'script', 'stylesheet']
   }, ['blocking', 'responseHeaders']);
